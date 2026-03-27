@@ -21,13 +21,12 @@ class Kernel(object):
 
 		:param nameRoutes: str
 		"""
-
 		self.__nameConfig = nameConfig
 		self.__nameRoutes = nameRoutes
-
-		self.__routes = {}
-		self.__config = {}
-		self.__env    = {}
+		self.__routes     = {}
+		self.__config     = {}
+		self.__env        = {}
+		
 		self.__loadConfig()
 		self.__connectToDatabase()
 		self.__loadRoutes()
@@ -50,12 +49,13 @@ class Kernel(object):
 			# Found, so I call the controller method
 			request = Request(
 				env=env,
-				paramsFromRoute=self.__routes[idx].getParamsFromPath(path=env.get('PATH_INFO'))
+				route=self.__routes[idx]
 			)
 
 			response = Response(
 				startResponse=startResponse,
-				request=request
+				request=request,
+				route=self.__routes[idx]
 			)
 
 			response.addHeader('X-Framework', 'Wsgi by Thomas Siemion')

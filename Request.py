@@ -1,6 +1,9 @@
 from typing import Dict
 from urllib.parse import unquote, parse_qs
 from io import BytesIO
+
+from .Route import HttpMethods
+from .Route import Route
 from .multipart import parse_form_data, MultipartPart
 from .Exceptions import ParamNotFound, ValueNotFound, FileNotFound
 
@@ -9,13 +12,19 @@ class Request(object):
 	"""
 		Represents the http request.
 	"""
-	def __init__(self, env: dict, paramsFromRoute: dict):
-		self.__env      = env
-		self.__header   = {}
-		self.__user     = self.__user = env.get('REMOTE_USER', '')
-		self.__password = ''
-
-		self.__params, self.__files = self.__getParameters(env, paramsFromRoute)
+	def __init__(self, env: dict, route: Route):
+		self.__env        = env
+		self.__header     = {}
+		self.__user       = self.__user = env.get('REMOTE_USER', '')
+		self.__password   = ''
+		self.__route      = route
+		self.__httpMethod = self.__httpMethod = env.get('REQUEST_METHOD', 'GET')
+		self.__pathInfo   = env.get('PATH_INFO', '/')
+		
+		self.__params, self.__files = self.__getParameters(
+			env,
+			self.__route.getParamsFromPath(path=env.get('PATH_INFO'))
+		)
 
 		self.__requestBodySize = 0
 		self.__requestBody     = ''
@@ -38,6 +47,34 @@ class Request(object):
 		self.__requestMethod = self.__env.get('REQUEST_METHOD', 'GET')
 
 		return
+	
+	
+	@property
+	def user(self) -> str:
+		return self.__user
+	
+	
+	@property
+	def httpMethod(self) -> HttpMethods:
+		return HttpMethods[self.__httpMethod]
+	
+	
+	@property
+	def pathInfo(self) -> str:
+		return self.__pathInfo
+	
+	
+	@property
+	def env(self) -> dict:
+		return self.__env
+	
+	
+	@property
+	def route(self) -> Route:
+		"""
+			Returns the route, that is responsible for this request.
+		"""
+		return self.__route
 
 
 	def getRequestBody(self) -> str:
@@ -142,14 +179,6 @@ class Request(object):
 		Returns the value of key from the env-Dict or None.
 		"""
 		return self.__env.get(key, None)
-
-
-	@property
-	def env(self) -> dict:
-		"""
-			Returns the environment dictionary.
-		"""
-		return self.__env
 
 
 	def __getParameters(self, env: dict, paramsFromRoute: dict) -> (dict, dict):

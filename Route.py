@@ -38,7 +38,8 @@ class Route(object):
             paramsDef={
                 'id': 'int',
                 'description': 'str'
-            }
+            },
+            nameRoute='admImageList'
         )
 
     """
@@ -48,7 +49,8 @@ class Route(object):
             nameController: str,
             nameMethod: str,
             httpMethod: HttpMethods,
-            paramsDef: dict = None
+            paramsDef: dict = None,
+            nameRoute: str|None = None
     ):
 
         if httpMethod not in HttpMethods:
@@ -60,6 +62,7 @@ class Route(object):
         self.__methodToCall        = None
         self.__httpMethod          = httpMethod
         self.__dictParamsDef       = paramsDef
+        self.__nameRoute           = self.__buildNameRoute(nameRoute)
         self.__pathRegEx           = self.__buildPathRegEx()
 
         if paramsDef is None:
@@ -101,6 +104,14 @@ class Route(object):
         Returns the RegEx-String to match the route
         """
         return self.__pathRegEx
+    
+    
+    @property
+    def name(self) -> str:
+        """
+        Returns the name of the route, if defined. Otherwise, returns an empty string.
+        """
+        return self.__nameRoute
 
 
     def setConfig(self, config: dict):
@@ -140,6 +151,14 @@ class Route(object):
                 paramsFromPath[placeHolder] = int(matches.group(placeHolder))
 
         return paramsFromPath
+    
+    
+    def nameMatches(self, lstNames: list|str = []) -> bool:
+        if type(lstNames) is str:
+            lstNames = [lstNames]
+            
+        return self.__nameRoute in lstNames
+    
 
 
     def __buildMethod(self):
@@ -167,7 +186,7 @@ class Route(object):
                 raise InvalidData(returnMsg=f'Parameter "{placeHolderPlain}" not defined in paramsDef. Route = {self.__path}')
 
             if 'str' == self.__dictParamsDef[placeHolderPlain]:
-                to = "(?P<{n}>[\w\/\-\.]{{1,}})".format(n=placeHolderPlain)
+                to = r"(?P<{n}>[\w\/\-\.]{{1,}})".format(n=placeHolderPlain)
             elif 'int' == self.__dictParamsDef[placeHolderPlain]:
                 to = "(?P<{n}>[0-9]{{1,}})".format(n=placeHolderPlain)
             else:
@@ -175,6 +194,22 @@ class Route(object):
 
             strPathRegEx = strPathRegEx.replace(placeHolder, to)
         return strPathRegEx
+    
+    
+    def __buildNameRoute(self, nameRoute: str|None) -> str:
+        """
+        Builds the name of the route. If nameRoute is not empty, it is returned.
+        Otherwise, the name is built from the controller, the method to call,
+        and the httpMethod.
+        """
+        if nameRoute is not None:
+            return nameRoute
+        
+        return ('.'.join(self.__nameControllerParts)
+                + ':'
+                + self.__nameMethod
+                + ':'
+                + self.__httpMethod.name)
 
 
     def __str__(self):

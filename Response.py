@@ -1,4 +1,5 @@
 from .Request import Request
+from .Route import Route
 from .Exceptions import NotAllowedHttpResponseCode
 from .Cookie import Cookie
 
@@ -107,13 +108,13 @@ class ResponseCodeToText(object):
 
 
 
-
 class Response(object):
     """
         Representation of the response, that is sent back to the web server
     """
-    def __init__(self, request: Request, startResponse):
+    def __init__(self, request: Request, startResponse, route: Route):
         self.__request       = request
+        self.__route         = route
         self.__startResponse = startResponse
         self.contentType     = 'text/plain'
         self.charset         = 'utf-8'
@@ -132,6 +133,14 @@ class Response(object):
     @property
     def request(self) -> Request:
         return self.__request
+    
+    
+    @property
+    def route(self) -> Route:
+        """
+			Returns the route, that is responsible for this request.
+		"""
+        return self.__route
 
 
     @property
