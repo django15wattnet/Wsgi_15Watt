@@ -243,10 +243,7 @@ Use what ever you like as your ORM or database access.
 At this moment SqlObject is needed.
 
 ## ToDos
-- Add a complete route-object to the request
-- Add a complete route-object to the response
 - Find a way to determine that a uri (with parameters) matches a route
   - vulgo: find a way to determine that the request path ```/do/42/machWas``` matches the route ```/do/{id}/{what}```
-- Make the use of [SqlObject](https://www.sqlobject.org/) optional
 - Change the language of the comments and documentation from german to english
 - Write and test a configuration for [nginx](https://nginx.org/)

@@ -1,6 +1,5 @@
 import traceback
 from importlib import import_module
-from sqlobject import *
 from .Request import Request
 from .Response import Response
 from .Route import HttpMethods
@@ -24,11 +23,10 @@ class Kernel(object):
 		self.__nameConfig = nameConfig
 		self.__nameRoutes = nameRoutes
 		self.__routes     = {}
-		self.__config     = {}
+		self._config      = {}
 		self.__env        = {}
 		
 		self.__loadConfig()
-		self.__connectToDatabase()
 		self.__loadRoutes()
 
 
@@ -69,7 +67,7 @@ class Kernel(object):
 				)
 
 			except Exception as e:
-				if 'debug' in self.__config and self.__config['debug'] is True:
+				if 'debug' in self._config and self._config['debug'] is True:
 					tb = traceback.format_exc()
 				else:
 					tb = ''
@@ -111,23 +109,9 @@ class Kernel(object):
 			if k.startswith('__'):
 				continue
 
-			self.__config[k] = getattr(config, k)
+			self._config[k] = getattr(config, k)
 
 		return
-
-
-	def __connectToDatabase(self):
-		"""
-			If the key uriDb is present in the project root config.py, a SqlObject
-			database connection will be established.
-		:return:
-		"""
-		if 'uriDb' not in self.__config:
-			self.__config['dbConnection'] = None
-			return
-
-		self.__config['dbConnection'] = connectionForURI(uri=self.__config['uriDb'])
-		sqlhub.processConnection = self.__config['dbConnection']
 
 
 	def __loadRoutes(self):
@@ -138,7 +122,7 @@ class Kernel(object):
 		"""
 		module = import_module(name=self.__nameRoutes)
 		for route in getattr(module, self.__nameRoutes):
-			route.setConfig(config=self.__config)
+			route.setConfig(config=self._config)
 			k = f'{route.httpMethod.name}_{route.pathRegEx}'
 			self.__routes[k] = route
 
@@ -153,11 +137,11 @@ class Kernel(object):
 		:param response:
 		:return:
 		"""
-		if 'accessControlAllowOrigin' not in self.__config:
+		if 'accessControlAllowOrigin' not in self._config:
 			return
 
 		accessControlAllowOrigin = []
-		accessControlAllowOrigin = accessControlAllowOrigin + self.__config['accessControlAllowOrigin']
+		accessControlAllowOrigin = accessControlAllowOrigin + self._config['accessControlAllowOrigin']
 
 		if 0 == len(accessControlAllowOrigin) or False == request.hasHeader('Origin'):
 			return
@@ -173,8 +157,8 @@ class Kernel(object):
 			for debugging purposes only.
 		"""
 		ret = 'Config:\n'
-		for k in self.__config:
-			ret += '\t{key}={val}\n'.format(key=k, val=self.__config[k])
+		for k in self._config:
+			ret += '\t{key}={val}\n'.format(key=k, val=self._config[k])
 
 		ret += '\nRoutes:\n'
 
