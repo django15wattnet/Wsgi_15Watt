@@ -1,0 +1,22 @@
+[project]
+name = "Wsgi-15Watt"
+version = "0.9.11"
+authors = [
+  { name="Thomas Siemion", email="pypi@15watt.net" },
+]
+description = "A slim, fast and comfortable WSGI-Framework for Python >= 3.6."
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3.6",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP :: WSGI",
+]
+
+[project.urls]
+Homepage = "https://wsgi.15watt.net"
+Repository = "https://github.com/django15wattnet/Wsgi-15Watt"
+Issues = "https://github.com/django15wattnet/Wsgi-15Watt/issues"
