@@ -5,12 +5,12 @@
 #     python3 -m twine upload --repository pypi dist/*
 
 rm -rf pypiPackage
-mkdir -p pypiPackage/src/Wsgi-15Watt
+mkdir -p pypiPackage/src/Wsgi_15Watt
 mkdir -p pypiPackage/tests
 
 cp pyproject.toml pypiPackage/
 cp README.md pypiPackage/
-cp *.py pypiPackage/src/Wsgi-15Watt/
+cp *.py pypiPackage/src/Wsgi_15Watt/
 
 cd pypiPackage
 python3 -m build
