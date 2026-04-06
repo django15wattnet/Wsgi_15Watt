@@ -88,7 +88,8 @@ class Kernel(object):
 		# todo create a Error-Controller
 		response = Response(
 			startResponse=startResponse,
-			request=Request(env=env, paramsFromRoute={})
+			request=Request(env=env),
+            route=self.__routes[0]
 		)
 
 		response.returnCode    = 404
