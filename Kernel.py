@@ -2,7 +2,7 @@ import traceback
 from importlib import import_module
 from .Request import Request
 from .Response import Response
-from .Route import HttpMethods
+from .Route import HttpMethods, Route
 from .Exceptions import Base
 
 
@@ -86,10 +86,17 @@ class Kernel(object):
 
 		# No matching route found
 		# todo create a Error-Controller
+		routeError = Route(
+			path='/error',
+			httpMethod=HttpMethods.GET,
+			nameController='error',
+			nameMethod='index'
+		)
+		
 		response = Response(
 			startResponse=startResponse,
-			request=Request(env=env),
-            route=self.__routes[0]
+			request=Request(env=env, route=routeError),
+            route=routeError
 		)
 
 		response.returnCode    = 404
